@@ -1,0 +1,85 @@
+<html>
+<head>
+	<title>Scroll example</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<script src="bower_components/angular/angular.js"></script>
+    <script src="../dist/scroll.js"></script>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		.scroll {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			overflow: hidden;
+		}
+		.scroll-wrap {
+			position: absolute;
+		}
+		.refresh{
+			background: #7b91aa;
+			color: white;
+			font-weight: bold;
+			height: 50px;
+			margin-top: -50px;
+			text-align: center;
+			font-size: 16px;
+			line-height: 50px;
+
+			-webkit-transition: background-color 300ms;
+			-moz-transition: background-color 300ms;
+			-ms-transition: background-color 300ms;
+			-o-transition: background-color 300ms;
+			transition: background-color 300ms;
+		}
+	
+		
+		.refresh.active{
+			background: #006eb3;
+		}
+		
+		.refresh.running{
+			background: #00b373;
+		}
+		
+	</style>
+</head>
+<body ng-app="app" ng-controller="AppCtrl">
+<scroll on-refresh="refresh">
+	<refresher>Pull to Refresh</refresher>	
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+	tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+	quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+	consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+	cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+	proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+	tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+	quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+	consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+	cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+	proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+	<form action="">
+		<input type="checkbox" ng-model="infinityEnabled">
+	</form>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+	tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+	quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+	consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+	cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+	proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+	<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+	tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+	quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+	consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+	cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+	proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+	<infinity-scroll ng-if="infinityEnabled" on-infinite="infinity"></infinity-scroll>
+</scroll>
+<script src="app.js"></script>
+</body>
+</html>

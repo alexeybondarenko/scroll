@@ -18,9 +18,6 @@ app.directive('scroll', function ($log, $controller) {
                     scrollable: attrs['scrollable'],
                     zommable: attrs['zoomable']
                 });
-                $scope.$on('scroll.refresh', function () {
-                    ctrl.refresh();
-                });
             }
 
             return {pre: prelink};

@@ -29,7 +29,6 @@ app.controller('AppCtrl', function ($scope, $timeout) {
     }
     $scope.list = [];
     addItem(20);
-    $scope.$broadcast('$scroll.refresh');
 
 });
 

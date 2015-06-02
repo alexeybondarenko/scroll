@@ -68,13 +68,13 @@
 	</style>
 </head>
 <body ng-app="app" ng-controller="AppCtrl">
-<scroll on-refresh="refresh">
+<scroll on-refresh="refresh()">
 	<refresher>Pull to Refresh</refresher>
     <button ng-click="alert(123)">Click</button>
 	<ul>
         <li ng-click="log(item)" ng-repeat="item in list">{{item}}</li>
     </ul>
-	<infinity-scroll ng-if="infinityEnabled" on-infinite="infinity"></infinity-scroll>
+	<infinity-scroll ng-if="infinityEnabled" on-infinite="infinity()"></infinity-scroll>
 </scroll>
 <script src="app.js"></script>
 </body>

@@ -14,8 +14,8 @@ app.directive('infinityScroll', function ($log) {
             this.infinityScroll = function () {
                 if (_isLoading) return;
                 console.log('infinityScroll', $scope.onInfinite());
-                if ($scope.onInfinite()) {
-                    $scope.onInfinite()();
+                if ($scope.onInfinite) {
+                    $scope.onInfinite();
                     _isLoading = true;
                 }
             };

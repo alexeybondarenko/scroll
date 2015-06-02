@@ -28,7 +28,7 @@ app.controller('$scroll', function ($scope) {
             }, function () {
                 refreshElem.className += " " + config.runningClass;
                 refreshElem.innerHTML = scope.refreshText;
-                if ($scope.onRefresh) $scope.onRefresh()()
+                if ($scope.onRefresh) $scope.onRefresh()
             });
         }
     };

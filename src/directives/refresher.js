@@ -7,9 +7,9 @@ app.directive('refresher', function ($log) {
         replace: false,
         template: '<div class="refresh"></div>',
         scope: {
-            pullText: '=',
-            releaseText: '=',
-            refreshText: '='
+            pullText: '@',
+            releaseText: '@',
+            refreshText: '@'
         },
         link: function ($scope, el, attrs, ctrls) {
             var scrollCtrl = ctrls[0];

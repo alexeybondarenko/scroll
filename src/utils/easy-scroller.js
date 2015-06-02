@@ -103,20 +103,22 @@ EasyScroller.prototype.bindEvents = function() {
 	// touch devices bind touch events
 	if ('ontouchstart' in window) {
 
+        var __hasStarted = false;
 		this.container.addEventListener("touchstart", function(e) {
 			// Don't react if initial down happens on a form element
 			if (e.touches[0] && e.touches[0].target && e.touches[0].target.tagName.match(/input|textarea|select/i)) {
 				return;
 			}
 			that.scroller.doTouchStart(e.touches, e.timeStamp);
+            e.preventDefault();
 		}, false);
 
 		document.addEventListener("touchmove", function(e) {
-			that.scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
+            that.scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
 		}, false);
 
 		document.addEventListener("touchend", function(e) {
-			that.scroller.doTouchEnd(e.timeStamp);
+            that.scroller.doTouchEnd(e.timeStamp);
 		}, false);
 
 		document.addEventListener("touchcancel", function(e) {

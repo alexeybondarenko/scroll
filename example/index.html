@@ -19,7 +19,11 @@
 		}
 		.scroll-wrap {
 			position: absolute;
+            width: 100%
 		}
+        refresher {
+            display: block;
+        }
 		.refresh{
 			background: #7b91aa;
 			color: white;
@@ -50,7 +54,7 @@
 </head>
 <body ng-app="app" ng-controller="AppCtrl">
 <scroll on-refresh="refresh">
-	<refresher>Pull to Refresh</refresher>	
+	<refresher>Pull to Refresh</refresher>
 	<ul>
         <li ng-repeat="item in list">{{item}}</li>
     </ul>

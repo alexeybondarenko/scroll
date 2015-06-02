@@ -4,7 +4,7 @@ app.directive('refresher', function ($log) {
     return {
         restrict: 'E',
         require: ['^scroll'],
-        replace: true,
+        replace: false,
         template: '<div class="refresh"></div>',
         scope: {
             pullText: '=',
@@ -17,7 +17,8 @@ app.directive('refresher', function ($log) {
             $scope.releaseText = $scope.releaseText || 'Release to refresh...';
             $scope.refreshText = $scope.refreshText || 'Loading...';
             $log.debug('refresher directive:: scroll ctrl', ctrls, scrollCtrl.scroll);
-            scrollCtrl.setRefresher(el, $scope);
+
+            scrollCtrl.setRefresher(angular.element(el[0].querySelector('.refresh')), $scope);
             $scope.$on('$scrollDidFinishLoading', function () {
                 scrollCtrl._finishRefresh();
             });

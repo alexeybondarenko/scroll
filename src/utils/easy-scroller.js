@@ -93,12 +93,12 @@ EasyScroller.prototype.bindEvents = function() {
 	var that = this;
 
 	// reflow handling
-	window.addEventListener("resize", function() {
-		that.reflow();
-	}, false);
-    window.addEventListener("DOMSubtreeModified", function() {
+    var reflow = Utils.throttle(function () {
         that.reflow();
-    }, false);
+    }, 300);
+	window.addEventListener("resize", reflow, false);
+    window.addEventListener("DOMNodeInserted", reflow, false);
+    window.addEventListener("DOMNodeRemoved", reflow, false);
 
 	// touch devices bind touch events
 	if ('ontouchstart' in window) {

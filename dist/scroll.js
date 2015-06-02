@@ -1616,12 +1616,12 @@ EasyScroller.prototype.bindEvents = function() {
 	var that = this;
 
 	// reflow handling
-	window.addEventListener("resize", function() {
-		that.reflow();
-	}, false);
-    window.addEventListener("DOMSubtreeModified", function() {
+    var reflow = Utils.throttle(function () {
         that.reflow();
-    }, false);
+    }, 300);
+	window.addEventListener("resize", reflow, false);
+    window.addEventListener("DOMNodeInserted", reflow, false);
+    window.addEventListener("DOMNodeRemoved", reflow, false);
 
 	// touch devices bind touch events
 	if ('ontouchstart' in window) {
@@ -1717,9 +1717,6 @@ app.controller('$scroll', function ($scope) {
     this._finishRefresh = function () {
         this.scroll.refresher.className = this.scroll.refresher.className.replace(" " + this.scroll.refreshConfig.runningClass, "");
         this.scroll.scroller.finishPullToRefresh();
-    };
-    this.refresh = function () {
-        console.log(this.scroll);
     };
     this.setRefresher = function (refreshElem, scope, config) {
 
@@ -1827,7 +1824,7 @@ app.directive('refresher', function ($log) {
     return {
         restrict: 'E',
         require: ['^scroll'],
-        replace: true,
+        replace: false,
         template: '<div class="refresh"></div>',
         scope: {
             pullText: '=',
@@ -1840,7 +1837,8 @@ app.directive('refresher', function ($log) {
             $scope.releaseText = $scope.releaseText || 'Release to refresh...';
             $scope.refreshText = $scope.refreshText || 'Loading...';
             $log.debug('refresher directive:: scroll ctrl', ctrls, scrollCtrl.scroll);
-            scrollCtrl.setRefresher(el, $scope);
+
+            scrollCtrl.setRefresher(angular.element(el[0].querySelector('.refresh')), $scope);
             $scope.$on('$scrollDidFinishLoading', function () {
                 scrollCtrl._finishRefresh();
             });
@@ -1866,9 +1864,6 @@ app.directive('scroll', function ($log, $controller) {
                 ctrl.setScroll(scrollWrap[0], {
                     scrollable: attrs['scrollable'],
                     zommable: attrs['zoomable']
-                });
-                $scope.$on('scroll.refresh', function () {
-                    ctrl.refresh();
                 });
             }
 

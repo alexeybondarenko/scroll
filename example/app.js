@@ -3,6 +3,14 @@
 var app = angular.module('app', ['scroll']);
 console.log('app.js');
 app.controller('AppCtrl', function ($scope, $timeout) {
+    $scope.alert = function (text) {
+        console.log('alert');
+        alert(text);
+    };
+    $scope.log = function (item) {
+        console.log(item);
+        alert(item);
+    };
 	$scope.refresh = function ()  {
         $scope.list = [];
         addItem(20);

@@ -1627,15 +1627,11 @@ EasyScroller.prototype.bindEvents = function() {
 	if ('ontouchstart' in window) {
 
 		this.container.addEventListener("touchstart", function(e) {
-
 			// Don't react if initial down happens on a form element
 			if (e.touches[0] && e.touches[0].target && e.touches[0].target.tagName.match(/input|textarea|select/i)) {
 				return;
 			}
-
 			that.scroller.doTouchStart(e.touches, e.timeStamp);
-			e.preventDefault();
-
 		}, false);
 
 		document.addEventListener("touchmove", function(e) {

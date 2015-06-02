@@ -2,7 +2,7 @@
 
 app.directive('scroll', function ($log, $controller) {
     return {
-        restrict: 'E',
+        restrict: 'EA',
         scope: {
             'onRefresh': '&'
         },
@@ -17,6 +17,9 @@ app.directive('scroll', function ($log, $controller) {
                 ctrl.setScroll(scrollWrap[0], {
                     scrollable: attrs['scrollable'],
                     zommable: attrs['zoomable']
+                });
+                $scope.$on('scroll.refresh', function () {
+                    ctrl.refresh();
                 });
             }
 

@@ -4,7 +4,6 @@ var EasyScroller = function(content, options) {
 	this.container = content.parentNode;
 	this.options = options || {};
 
-	console.log('options', options);
 	// create Scroller instance
 	var that = this;
 	this.scroller = new Scroller(function(left, top, zoom) {
@@ -97,6 +96,9 @@ EasyScroller.prototype.bindEvents = function() {
 	window.addEventListener("resize", function() {
 		that.reflow();
 	}, false);
+    window.addEventListener("DOMSubtreeModified", function() {
+        that.reflow();
+    }, false);
 
 	// touch devices bind touch events
 	if ('ontouchstart' in window) {

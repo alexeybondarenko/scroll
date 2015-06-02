@@ -6,6 +6,9 @@ app.controller('$scroll', function ($scope) {
         this.scroll.refresher.className = this.scroll.refresher.className.replace(" " + this.scroll.refreshConfig.runningClass, "");
         this.scroll.scroller.finishPullToRefresh();
     };
+    this.refresh = function () {
+        console.log(this.scroll);
+    };
     this.setRefresher = function (refreshElem, scope, config) {
 
         refreshElem = angular.element(refreshElem);

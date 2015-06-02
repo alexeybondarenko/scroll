@@ -1527,7 +1527,6 @@ var EasyScroller = function(content, options) {
 	this.container = content.parentNode;
 	this.options = options || {};
 
-	console.log('options', options);
 	// create Scroller instance
 	var that = this;
 	this.scroller = new Scroller(function(left, top, zoom) {
@@ -1620,6 +1619,9 @@ EasyScroller.prototype.bindEvents = function() {
 	window.addEventListener("resize", function() {
 		that.reflow();
 	}, false);
+    window.addEventListener("DOMSubtreeModified", function() {
+        that.reflow();
+    }, false);
 
 	// touch devices bind touch events
 	if ('ontouchstart' in window) {
@@ -1715,6 +1717,9 @@ app.controller('$scroll', function ($scope) {
     this._finishRefresh = function () {
         this.scroll.refresher.className = this.scroll.refresher.className.replace(" " + this.scroll.refreshConfig.runningClass, "");
         this.scroll.scroller.finishPullToRefresh();
+    };
+    this.refresh = function () {
+        console.log(this.scroll);
     };
     this.setRefresher = function (refreshElem, scope, config) {
 
@@ -1846,7 +1851,7 @@ app.directive('refresher', function ($log) {
 
 app.directive('scroll', function ($log, $controller) {
     return {
-        restrict: 'E',
+        restrict: 'EA',
         scope: {
             'onRefresh': '&'
         },
@@ -1861,6 +1866,9 @@ app.directive('scroll', function ($log, $controller) {
                 ctrl.setScroll(scrollWrap[0], {
                     scrollable: attrs['scrollable'],
                     zommable: attrs['zoomable']
+                });
+                $scope.$on('scroll.refresh', function () {
+                    ctrl.refresh();
                 });
             }
 

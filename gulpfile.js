@@ -28,3 +28,7 @@ gulp.task('build', function () {
         }))
         .pipe(gulp.dest('./dist'));
 });
+gulp.task('watch', function () {
+    gulp.watch(sources, ['build']);
+});
+gulp.task('serve', ['build', 'watch']);

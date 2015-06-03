@@ -1711,17 +1711,19 @@ EasyScroller.prototype.bindEvents = function() {
 
 
 
-app.controller('$scroll', function ($scope) {
+app.controller('$scroll', function ($scope, $log) {
     this.scroll = null;
     this._finishRefresh = function () {
-        this.scroll.refresher.className = this.scroll.refresher.className.replace(" " + this.scroll.refreshConfig.runningClass, "");
+        this.scroll.refresher.removeClass(this.scroll.refreshConfig.runningClass);
+        this.scroll.refresher.removeClass(this.scroll.refreshConfig.activeClass);
+
         this.scroll.scroller.finishPullToRefresh();
     };
     this.setRefresher = function (refreshElem, scope, config) {
 
-        refreshElem = angular.element(refreshElem);
-        refreshElem = refreshElem[0];
-        this.scroll.refresher = refreshElem;
+        this.scroll.refresher = angular.element(refreshElem);
+        var height = refreshElem[0].offsetHeight;
+
         config = config || {
             activeClass: 'active',
             runningClass: 'running'
@@ -1730,15 +1732,28 @@ app.controller('$scroll', function ($scope) {
         this.scroll.refreshConfig = config;
 
         if (this.scroll) {
-            this.scroll.scroller.activatePullToRefresh(refreshElem.offsetHeight, function () {
-                refreshElem.className += " " + config.activeClass;
-                refreshElem.innerHTML = scope.pullText;
+            var self = this;
+            this.scroll.scroller.activatePullToRefresh(height, function () {
+                self.scroll.refresher.addClass(config.activeClass);
+                $log.debug('refresher:: release');
+                scope.$apply(function () {
+                    scope.text = scope.releaseText;
+                    scope.icon = scope.releaseIcon;
+                })
             }, function () {
-                refreshElem.className = refreshElem.className.replace(" " + config.activeClass, "");
-                refreshElem.innerHTML = scope.releaseText;
+                self.scroll.refresher.removeClass(config.activeClass);
+                $log.debug('refresher:: pull');
+                scope.$apply(function () {
+                    scope.text = scope.pullText;
+                    scope.icon = scope.pullIcon;
+                });
             }, function () {
-                refreshElem.className += " " + config.runningClass;
-                refreshElem.innerHTML = scope.refreshText;
+                self.scroll.refresher.addClass(config.runningClass);
+                $log.debug('refresher:: refresh');
+                scope.$apply(function () {
+                    scope.text = scope.refreshText;
+                    scope.icon = scope.refreshIcon;
+                });
                 if ($scope.onRefresh) $scope.onRefresh()
             });
         }
@@ -1824,7 +1839,7 @@ app.directive('refresher', function ($log) {
         restrict: 'E',
         require: ['^scroll'],
         replace: false,
-        template: '<div class="refresh"></div>',
+        template: '<div class="refresh"><i class="icon" ng-class="icon"></i>{{text}}</div>',
         scope: {
             pullText: '@',
             releaseText: '@',
@@ -1832,13 +1847,24 @@ app.directive('refresher', function ($log) {
         },
         link: function ($scope, el, attrs, ctrls) {
             var scrollCtrl = ctrls[0];
-            $scope.pullText = $scope.pullText || 'Pull to refresh...';
+            $scope.pullText = $scope.pullText || 'Pull new to refresh...';
+            $scope.pullIcon = $scope.pullIcon || 'icon-arrow-down';
+
             $scope.releaseText = $scope.releaseText || 'Release to refresh...';
+            $scope.releaseIcon = $scope.releaseIcon || 'icon-arrow-up';
+
             $scope.refreshText = $scope.refreshText || 'Loading...';
+            $scope.refreshIcon = $scope.refreshIcon || 'icon-spinner';
+
+            $scope.text = $scope.pullText;
+            $scope.icon = $scope.pullIcon;
+
             $log.debug('refresher directive:: scroll ctrl', ctrls, scrollCtrl.scroll);
 
             scrollCtrl.setRefresher(angular.element(el[0].querySelector('.refresh')), $scope);
             $scope.$on('$scrollDidFinishLoading', function () {
+                $scope.text = $scope.pullText;
+                $scope.icon = $scope.pullIcon;
                 scrollCtrl._finishRefresh();
             });
         }

@@ -4,10 +4,9 @@ app.directive('infinityScroll', function ($log) {
     return {
         restrict: "E",
         require: ['^scroll','infinityScroll'],
-        replace: true,
-        template: '<div class="infinity-scroll">loading</div>',
         scope: {
-            onInfinite: '&'
+            onInfinite: '&',
+            distance: '@'
         },
         controller: function ($scope) {
             var _isLoading = false;
@@ -24,17 +23,14 @@ app.directive('infinityScroll', function ($log) {
             };
         },
         link: function (scope, el, attrs, ctrls) {
-            console.log(ctrls);
             var scrollCtrl = ctrls[0],
                 infiniteCtrl = ctrls[1];
-            var config = {
-                start: 50 // start from 50px from bottom
-            };
+            el.addClass('infinity-scroll');
+            scope.distance = scope.distance || 50;
             $log.debug('infinity scroll', scrollCtrl);
             scrollCtrl.$element.bind('scroll', function (e, data) {
                 var bottom = scrollCtrl.scroll.scroller.__contentHeight - scrollCtrl.scroll.scroller.__clientHeight - data.top;
-                $log.debug('infinity scroll', bottom, config.start);
-                if (bottom < config.start) {
+                if (bottom < scope.distance) {
                     infiniteCtrl.infinityScroll();
                 }
             });

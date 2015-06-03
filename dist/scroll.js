@@ -1614,38 +1614,24 @@ EasyScroller.prototype.reflow = function() {
 function isTouchDevice() {
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 }
-function isInput(el) {
-    var tagName = el && el.tagName && el.tagName.toLowerCase();
-    return (tagName == 'input' && el.type != 'button' && el.type != 'radio' && el.type != 'checkbox') || (tagName == 'textarea');
-}
+
 function getActiveElement() {
     try {
         return document.activeElement;  // can get exeption in IE8
-    } catch(e) {
+    } catch (e) {
     }
 }
-function getViewport() {    // Note viewport sizing broken in Android 2.x see http://stackoverflow.com/questions/6601881/problem-with-meta-viewport-and-android
 
-    var viewport = {
-        left: window.pageXOffset,   // http://www.quirksmode.org/mobile/tableViewport.html
-        top: window.pageYOffset,
-        width: window.innerWidth || documentElement.clientWidth,
-        height: window.innerHeight || documentElement.clientHeight
-    };
-    if (isTouchDevice() && isInput(getActiveElement())) {     // iOS *lies* about viewport size when keyboard is visible. See http://stackoverflow.com/questions/2593139/ipad-web-app-detect-virtual-keyboard-using-javascript-in-safari Input focus/blur can indicate, also scrollTop:
-        return {
-            left: viewport.left,
-            top: viewport.top,
-            width: viewport.width,
-            height: viewport.height * (viewport.height > viewport.width ? 0.66 : 0.45)  // Fudge factor to allow for keyboard on iPad
-        };
-    }
-    return viewport;
+function isInput(el) {
+    var tagName = el && el.tagName && el.tagName.toLowerCase();
+    return (tagName == 'input' && el.type != 'button' && el.type != 'radio' && el.type != 'checkbox') || (tagName == 'textarea' || tagName == 'label' || tagName == 'form');
 }
 function isInputEvent (e) {
     return e.touches[0] && e.touches[0].target && isInput(e.touches[0].target)
 }
-
+function isAndroid () {
+    return /Android/i.test(navigator.userAgent);
+}
 EasyScroller.prototype.bindEvents = function() {
 
 	var that = this;
@@ -1658,17 +1644,44 @@ EasyScroller.prototype.bindEvents = function() {
     window.addEventListener("DOMNodeInserted", reflow, false);
     window.addEventListener("DOMNodeRemoved", reflow, false);
 
+    function waitForEvent (event, callback) {
+        var listener = window.addEventListener(event, function () {
+            callback();
+            window.removeEventListener(event, listener);
+        });
+    }
+    function scrollToElement (element) {
+        var topElement = element.offsetTop;
+        waitForEvent('resize', function () {
+            that.scroller.scrollTo(0, topElement - 50, false);
+        });
+    }
+    window.scroll = that; // for test from console
+
 	// touch devices bind touch events
 	if ('ontouchstart' in window) {
 
-        var __hasStarted = false;
-        var __viewportSize = getViewport();
+        var focusedInput = null;
+        var __isTouchDevice = isTouchDevice();
+        var __isAndroid = isAndroid();
+
 		this.container.addEventListener("touchstart", function(e) {
 			// Don't react if initial down happens on a form element
 			if (isInputEvent(e)) {
-                reflow(); // it is possible, that on mobile devices keyboard will appear
+                //if (focusedInput) return;
+                if (__isTouchDevice) {
+                    if (__isAndroid) scrollToElement(e.touches[0].target);
+                    focusedInput = true;
+                }
                 return;
 			}
+
+            if (focusedInput) {
+                console.log('blur', focusedInput);
+                getActiveElement().blur();
+                focusedInput = false;
+            }
+
 			that.scroller.doTouchStart(e.touches, e.timeStamp);
 		}, false);
         this.container.parentNode.addEventListener("touchmove", function (e) {
@@ -1679,16 +1692,10 @@ EasyScroller.prototype.bindEvents = function() {
 		}, false);
 
         this.container.addEventListener("touchend", function(e) {
-            if (isInputEvent(e)) {
-                console.log('touchend', __viewportSize, getViewport());
-            }
             that.scroller.doTouchEnd(e.timeStamp);
 		}, false);
 
         this.container.addEventListener("touchcancel", function(e) {
-            if (isInputEvent(e)) {
-                console.log('touchcancel', __viewportSize, getViewport());
-            }
 			that.scroller.doTouchEnd(e.timeStamp);
 		}, false);
 
@@ -1936,102 +1943,6 @@ app.directive('scroll', function ($log, $controller) {
         }
     }
 });
-;(function() {
-    
-
-
-    var elems = document.querySelectorAll("input, textarea");
-    console.log('keyboard js', elems);
-    var onelemfocus, onelemblur;
-
-    var isKeyboardShown = false;
-    var keyboardShowing, keyboardHiding;
-    var fieldBlur = null;
-    var currentInnerHeight;
-    var currIndex = 0, prevIndex = 0;
-    var isAClick = false;
-
-    onelemfocus = function(evt) {
-        var that = this;
-
-        prevIndex = currIndex;
-        currIndex = evt.target.dataset.servantIndex;
-
-        if (!isKeyboardShown) {
-            currentInnerHeight = window.innerHeight;
-            keyboardShowing = window.setInterval(function() {
-                if (currentInnerHeight === window.innerHeight) {
-                    window.clearInterval(keyboardShowing);
-
-                    var evtAfter = document.createEvent("Event");
-                    evtAfter.initEvent('keyboardshow', true, true);
-                    console.log('keyboard shown');
-                    that.dispatchEvent(evtAfter);
-                    isKeyboardShown = true;
-                }
-                currentInnerHeight = window.innerHeight;
-            }, 20);
-        } else {
-            window.clearTimeout(fieldBlur);
-        }
-
-        if (!isAClick) {
-            var evtName;
-
-            if (prevIndex < currIndex) {
-                evtName = "nextbuttonclick";
-            } else {
-                evtName = "previousbuttonclick";
-            }
-
-            var evtPrevNext = document.createEvent("Event");
-            evtPrevNext.initEvent(evtName, true, true);
-            that.dispatchEvent(evtPrevNext);
-        }
-    };
-
-    onelemblur = function(evt) {
-        var that = this;
-
-        fieldBlur = window.setTimeout(function() {
-            var evtBefore = document.createEvent("Event");
-            evtBefore.initEvent('keyboardhide', true, true);
-            console.log('keyboard hide');
-            that.dispatchEvent(evtBefore);
-            isKeyboardShown = false;
-        },1);
-    };
-
-    [].forEach.call(elems, function(elem, i) {
-        elem.dataset.servantIndex = elem.getAttribute("tabindex") || (i + 1);
-        elem.addEventListener("focus", onelemfocus, false);
-        elem.addEventListener("blur", onelemblur, false);
-    });
-
-    // Hide keyboard when clicking document
-    var pageXO, pageYO;
-    document.documentElement.addEventListener("touchstart", function(evt) {
-        // Prevent keyboardhide when scrolling while keyboard is visible
-        pageXO = window.pageXOffset;
-        pageYO = window.pageYOffset;
-        isAClick = true;
-        window.setTimeout(function() {
-            isAClick = false;
-        }, 1000);
-    });
-
-    document.documentElement.addEventListener("touchend", function(evt) {
-        if (pageXO !== window.pageXOffset || pageYO !== window.pageYOffset) {
-            return false;
-        }
-
-        var nodeName = evt.target.nodeName.toLowerCase();
-
-        if (nodeName !== "input" && nodeName !== "textarea" && nodeName !== "select") {
-            document.activeElement.blur();
-        }
-    });
-}());
 var Utils = {
 	throttle: function(func, wait, options) {
       var context, args, result;

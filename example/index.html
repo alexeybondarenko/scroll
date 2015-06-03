@@ -1,17 +1,26 @@
 <html>
 <head>
 	<title>Scroll example</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, height=device-height">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 	<script src="bower_components/angular/angular.js"></script>
     <script src="../dist/scroll.js"></script>
 	<style>
 		body {
 			margin: 0;
 			padding: 0;
-            position: fixed;top: 0;
+            font-family: Helvetica, sans-serif;
+            font-size: 14px;
+
+            position: absolute;
+            top: 0;
             left:0;
-            width: 100%;
-            height: 100%;
+            bottom: 0;
+            right: 0;
+
+            /*-webkit-touch-callout: none;*/
+            /*-webkit-font-smoothing: antialiased;*/
+            /*overflow: hidden;*/
+
 
 		}
 		.scroll {
@@ -40,13 +49,10 @@
             border: 1px solid #ccc;
         }
 		.refresh{
-			background: #7b91aa;
-			color: white;
-			font-weight: bold;
 			height: 50px;
 			margin-top: -50px;
 			text-align: center;
-			font-size: 16px;
+
 			line-height: 50px;
 
 			-webkit-transition: background-color 300ms;
@@ -55,45 +61,88 @@
 			-o-transition: background-color 300ms;
 			transition: background-color 300ms;
 		}
-	
-		
-		.refresh.active{
-			background: #006eb3;
-		}
-		
-		.refresh.running{
-			background: #00b373;
-		}
-		
+        .header {
+            height: 40px;
+            text-align: center;
+            line-height: 40px;
+            font-size: 16px;
+            background-color: #2b3fcc;
+            color: white;
+        }
+        .screen {
+            position: absolute;
+            top: 40px;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            min-height: 44px;
+            margin: 0 0 1px 0;
+            padding: 0;
+            border: 1px solid #333;
+            background-color: #ccc;
+            font-size: inherit;
+            -webkit-appearance: none;
+        }
+		.input {
+            display: block;
+            width: 100%;
+            padding: 5px 10px;
+        }
 	</style>
 </head>
 <body ng-app="app" ng-controller="AppCtrl">
-<scroll on-refresh="refresh()">
-	<refresher>Pull to Refresh</refresher>
-    <button ng-click="alert(123)">Click</button>
-	<!--<ul>-->
-        <!--<li ng-click="log(item)" ng-repeat="item in list">{{item}}</li>-->
-    <!--</ul>-->
-    <ul>
-        <li>11</li>
-        <li>21</li>
-        <li>31</li>
-        <li>41</li>
-        <li>51</li>
-        <li>61</li>
-        <li>71</li>
-        <li>81</li>
-        <li>91</li>
-        <li>101</li>
-    </ul>
-    <form>
-        <label>
-            <input type="text"/>
-        </label>
-    </form>
-	<!--<infinity-scroll ng-if="infinityEnabled" on-infinite="infinity()">Test new</infinity-scroll>-->
+<div class="header">
+    Some header
+</div>
+<div class="screen">
+    <div class="screen__in">
+        <scroll on-refresh="refresh()">
+            <refresher>Pull to Refresh</refresher>
+            <button class="btn" ng-click="alert(123)">Click</button>
+            <!--<ul>-->
+            <!--<li ng-click="log(item)" ng-repeat="item in list">{{item}}</li>-->
+            <!--</ul>-->
+            <ul>
+                <li>11</li>
+                <li>21</li>
+                <li>31</li>
+                <li>41</li>
+                <li>51</li>
+                <li>61</li>
+                <li>71</li>
+                <li>81</li>
+                <li>91</li>
+                <li>101</li>
+            </ul>
+            <form>
+                <label>
+                    <input class="input" type="text"/>
+                </label>
+                <label>
+                    <input class="input" type="text"/>
+                </label>
+                <p>
+                    ~Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+                <label>
+                    <input class="input" type="text"/>
+                </label>
+                <button class="btn">Submit</button>
+            </form>
+            <!--<infinity-scroll ng-if="infinityEnabled" on-infinite="infinity()">Test new</infinity-scroll>-->
 
-</scroll>
+        </scroll>
+    </div>
+</div>
 <script src="app.js"></script>
 </body>
 </html>

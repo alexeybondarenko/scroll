@@ -25,21 +25,21 @@ app.controller('$scroll', function ($scope, $log) {
             this.scroll.scroller.activatePullToRefresh(height, function () {
                 self.scroll.refresher.addClass(config.activeClass);
                 $log.debug('refresher:: release');
-                scope.$apply(function () {
+                if (!scope.$$phase) scope.$apply(function () {
                     scope.text = scope.releaseText;
                     scope.icon = scope.releaseIcon;
                 })
             }, function () {
                 self.scroll.refresher.removeClass(config.activeClass);
                 $log.debug('refresher:: pull');
-                scope.$apply(function () {
+                if (!scope.$$phase) scope.$apply(function () {
                     scope.text = scope.pullText;
                     scope.icon = scope.pullIcon;
                 });
             }, function () {
                 self.scroll.refresher.addClass(config.runningClass);
                 $log.debug('refresher:: refresh');
-                scope.$apply(function () {
+                if (!scope.$$phase) scope.$apply(function () {
                     scope.text = scope.refreshText;
                     scope.icon = scope.refreshIcon;
                 });

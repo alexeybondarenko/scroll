@@ -1711,7 +1711,7 @@ EasyScroller.prototype.bindEvents = function() {
 
 
 
-app.controller('$scroll', function ($scope, $log) {
+app.controller('$scroll', function ($scope, $log, $timeout) {
     this.scroll = null;
     this._finishRefresh = function () {
         this.scroll.refresher.removeClass(this.scroll.refreshConfig.runningClass);
@@ -1736,20 +1736,24 @@ app.controller('$scroll', function ($scope, $log) {
             this.scroll.scroller.activatePullToRefresh(height, function () {
                 self.scroll.refresher.addClass(config.activeClass);
                 $log.debug('refresher:: release');
-                scope.text = scope.releaseText;
-                scope.icon = scope.releaseIcon;
-                scope.$$phase || scope.$apply();
+                $timeout(function () {
+                    scope.text = scope.releaseText;
+                    scope.icon = scope.releaseIcon;
+                });
             }, function () {
                 self.scroll.refresher.removeClass(config.activeClass);
                 $log.debug('refresher:: pull');
-                scope.text = scope.pullText;
-                scope.icon = scope.pullIcon;
-                scope.$$phase || scope.$apply();
+                $timeout(function () {
+                    scope.text = scope.pullText;
+                    scope.icon = scope.pullIcon;
+                });
             }, function () {
                 self.scroll.refresher.addClass(config.runningClass);
                 $log.debug('refresher:: refresh');
-                scope.text = scope.refreshText;
-                scope.icon = scope.refreshIcon;
+                $timeout(function () {
+                    scope.text = scope.refreshText;
+                    scope.icon = scope.refreshIcon;
+                });
 
                 if ($scope.onRefresh) $scope.onRefresh()
             });

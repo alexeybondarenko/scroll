@@ -1,7 +1,7 @@
 <html>
 <head>
 	<title>Scroll example</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, height=device-height">
 	<script src="bower_components/angular/angular.js"></script>
     <script src="../dist/scroll.js"></script>
 	<style>
@@ -71,10 +71,27 @@
 <scroll on-refresh="refresh()">
 	<refresher>Pull to Refresh</refresher>
     <button ng-click="alert(123)">Click</button>
-	<ul>
-        <li ng-click="log(item)" ng-repeat="item in list">{{item}}</li>
+	<!--<ul>-->
+        <!--<li ng-click="log(item)" ng-repeat="item in list">{{item}}</li>-->
+    <!--</ul>-->
+    <ul>
+        <li>11</li>
+        <li>21</li>
+        <li>31</li>
+        <li>41</li>
+        <li>51</li>
+        <li>61</li>
+        <li>71</li>
+        <li>81</li>
+        <li>91</li>
+        <li>101</li>
     </ul>
-	<infinity-scroll ng-if="infinityEnabled" on-infinite="infinity()">Test new</infinity-scroll>
+    <form>
+        <label>
+            <input type="text"/>
+        </label>
+    </form>
+	<!--<infinity-scroll ng-if="infinityEnabled" on-infinite="infinity()">Test new</infinity-scroll>-->
 
 </scroll>
 <script src="app.js"></script>

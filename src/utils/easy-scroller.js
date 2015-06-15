@@ -91,7 +91,14 @@ EasyScroller.prototype.reflow = function() {
 function isTouchDevice() {
     return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 }
-
+function offsetTop (element) {
+    var result = element.offsetTop;
+    if (/webkit.*mobile/i.test(navigator.userAgent)) {
+        result.top -= window.scrollY;
+    }
+    return result;
+}
+window.getOffsetTop = offsetTop;
 function getActiveElement() {
     try {
         return document.activeElement;  // can get exeption in IE8
@@ -111,47 +118,51 @@ function isAndroid () {
 }
 EasyScroller.prototype.bindEvents = function() {
 
-	var that = this;
-
-	// reflow handling
+    var that = this;
+    // reflow handling
     var reflow = Utils.throttle(function () {
         that.reflow();
     }, 300);
-	window.addEventListener("resize", reflow, false);
+
+    window.addEventListener("resize", reflow, false);
     window.addEventListener("DOMNodeInserted", reflow, false);
     window.addEventListener("DOMNodeRemoved", reflow, false);
 
     function waitForEvent (event, callback) {
-        var listener = window.addEventListener(event, function () {
+        var listener = function () {
             callback();
             window.removeEventListener(event, listener);
-        });
+        };
+        window.addEventListener(event, listener, false);
     }
     function scrollToElement (element) {
-        var topElement = element.offsetTop;
+        console.log('scroll to element', element);
+        var topElement = angular.element(element).offset().top;
         waitForEvent('resize', function () {
-            that.scroller.scrollTo(0, topElement - 50, false);
+            console.log('scroll to element: resize', element, that.scroller, topElement);
+            that.scroller.scrollTo(0, topElement - 50, false, 1);
+            element.focus();
         });
     }
     window.scroll = that; // for test from console
 
-	// touch devices bind touch events
-	if ('ontouchstart' in window) {
+    // touch devices bind touch events
+    if ('ontouchstart' in window) {
 
         var focusedInput = null;
         var __isTouchDevice = isTouchDevice();
         var __isAndroid = isAndroid();
 
-		this.container.addEventListener("touchstart", function(e) {
-			// Don't react if initial down happens on a form element
-			if (isInputEvent(e)) {
+        this.container.addEventListener("touchstart", function(e) {
+            // Don't react if initial down happens on a form element
+            if (isInputEvent(e)) {
                 //if (focusedInput) return;
                 if (__isTouchDevice) {
-                    if (__isAndroid) scrollToElement(e.touches[0].target);
+                    scrollToElement(e.touches[0].target);
                     focusedInput = true;
                 }
                 return;
-			}
+            }
 
             if (focusedInput) {
                 console.log('blur', focusedInput);
@@ -159,78 +170,62 @@ EasyScroller.prototype.bindEvents = function() {
                 focusedInput = false;
             }
 
-			that.scroller.doTouchStart(e.touches, e.timeStamp);
-		}, false);
+            that.scroller.doTouchStart(e.touches, e.timeStamp);
+        }, false);
         this.container.parentNode.addEventListener("touchmove", function (e) {
             e.preventDefault();
         });
         this.container.addEventListener("touchmove", function(e) {
             that.scroller.doTouchMove(e.touches, e.timeStamp, e.scale);
-		}, false);
+        }, false);
 
         this.container.addEventListener("touchend", function(e) {
             that.scroller.doTouchEnd(e.timeStamp);
-		}, false);
+        }, false);
 
         this.container.addEventListener("touchcancel", function(e) {
-			that.scroller.doTouchEnd(e.timeStamp);
-		}, false);
+            that.scroller.doTouchEnd(e.timeStamp);
+        }, false);
 
-	// non-touch bind mouse events
-	} else {
-		
-		var mousedown = false;
+        // non-touch bind mouse events
+    } else {
+        var mousedown = false;
+        this.container.addEventListener("mousedown", function(e) {
+            if (e.target.tagName.match(/input|textarea|select/i)) {
+                return;
+            }
+            that.scroller.doTouchStart([{
+                pageX: e.pageX,
+                pageY: e.pageY
+            }], e.timeStamp);
+            mousedown = true;
+            e.preventDefault();
+        }, false);
 
-		this.container.addEventListener("mousedown", function(e) {
+        document.addEventListener("mousemove", function(e) {
+            if (!mousedown) {
+                return;
+            }
+            that.scroller.doTouchMove([{
+                pageX: e.pageX,
+                pageY: e.pageY
+            }], e.timeStamp);
+            mousedown = true;
+        }, false);
 
-			if (e.target.tagName.match(/input|textarea|select/i)) {
-				return;
-			}
-		
-			that.scroller.doTouchStart([{
-				pageX: e.pageX,
-				pageY: e.pageY
-			}], e.timeStamp);
+        document.addEventListener("mouseup", function(e) {
+            if (!mousedown) {
+                return;
+            }
+            that.scroller.doTouchEnd(e.timeStamp);
+            mousedown = false;
+        }, false);
 
-			mousedown = true;
-			e.preventDefault();
-
-		}, false);
-
-		document.addEventListener("mousemove", function(e) {
-
-			if (!mousedown) {
-				return;
-			}
-			
-			that.scroller.doTouchMove([{
-				pageX: e.pageX,
-				pageY: e.pageY
-			}], e.timeStamp);
-
-			mousedown = true;
-
-		}, false);
-
-		document.addEventListener("mouseup", function(e) {
-
-			if (!mousedown) {
-				return;
-			}
-			
-			that.scroller.doTouchEnd(e.timeStamp);
-
-			mousedown = false;
-
-		}, false);
-
-		this.container.addEventListener("mousewheel", function(e) {
-			if(that.options.zooming) {
-				that.scroller.doMouseZoom(e.wheelDelta, e.timeStamp, e.pageX, e.pageY);	
-				e.preventDefault();
-			}
-		}, false);
-
-	}
-
+        this.container.addEventListener("mousewheel", function(e) {
+            if(that.options.zooming) {
+                that.scroller.doMouseZoom(e.wheelDelta, e.timeStamp, e.pageX, e.pageY);
+                e.preventDefault();
+            }
+        }, false);
+    }
 };

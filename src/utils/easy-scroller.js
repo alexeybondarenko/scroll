@@ -124,9 +124,15 @@ EasyScroller.prototype.bindEvents = function() {
         that.reflow();
     }, 300);
 
-    window.addEventListener("resize", reflow, false);
-    window.addEventListener("DOMNodeInserted", reflow, false);
-    window.addEventListener("DOMNodeRemoved", reflow, false);
+    window.addEventListener("resize", Utils.debounce(function () {
+        that.reflow();
+    }, 300), false);
+    window.addEventListener("DOMNodeInserted", Utils.debounce(function () {
+        that.reflow();
+    }, 600), false);
+    window.addEventListener("DOMNodeRemoved", Utils.debounce(function () {
+        that.reflow();
+    }, 300), false);
 
     function waitForEvent (event, callback) {
         var listener = function () {
